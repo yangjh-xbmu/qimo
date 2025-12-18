@@ -1,19 +1,27 @@
 import React from 'react';
 import { scholars } from '../data';
+import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 
 const Scholars: React.FC = () => {
+  const { elementRef, isVisible } = useIntersectionObserver();
+
   return (
-    <section id="scholars" className="py-20 bg-white">
+    <section id="scholars" className="py-20 bg-white" ref={elementRef}>
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-primary mb-12 text-center font-serif">致敬学者</h2>
+        <h2 className={`text-3xl font-bold text-primary mb-12 text-center font-serif transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>致敬学者</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-          {scholars.map((scholar) => (
-            <div key={scholar.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+          {scholars.map((scholar, index) => (
+            <div 
+              key={scholar.id} 
+              className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-700 transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+              style={{ transitionDelay: `${index * 150}ms` }}
+            >
               <div className="aspect-square overflow-hidden bg-gray-100 relative group">
                 <img 
                   src={scholar.image} 
                   alt={scholar.name}
+                  loading="lazy"
                   className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">

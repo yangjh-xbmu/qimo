@@ -2,6 +2,14 @@ interface Env {
   DEEPSEEK_API_KEY: string;
 }
 
+interface DeepSeekResponse {
+  choices: {
+    message: {
+      content: string;
+    };
+  }[];
+}
+
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const { request, env } = context;
@@ -51,7 +59,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         throw new Error(`API Error: ${response.status}`);
     }
 
-    const data: any = await response.json();
+    const data = await response.json() as DeepSeekResponse;
     const aiMessage = data.choices[0].message.content;
 
     return new Response(JSON.stringify({ reply: aiMessage }), {
@@ -59,6 +67,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     });
 
   } catch (error) {
+    console.error('Error handling chat request:', error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
