@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { personalInfo, works, experiences, values, scholars } from '../data';
+import { personalInfo, works, experiences, scholars } from '../data';
 
 export interface Message {
   id: string;
@@ -86,35 +86,27 @@ export const useChat = () => {
     }
 
     try {
-      // 模拟API调用 - 实际项目中这里会调用Cloudflare Function
-      // const response = await fetch('/api/chat', { ... });
-      
-      // 模拟网络延迟
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // 简单的模拟回复逻辑
-      let mockResponse = "";
-      const lowerText = text.toLowerCase();
-      
-      if (lowerText.includes('作品') || lowerText.includes('work')) {
-        mockResponse = "林悦然的主要作品包括实验短片《回声之间》（2023）和沉浸式戏剧《镜面剧场》（2022）。她最近还在进行《城市折叠》跨媒介艺术项目。你想了解哪一个的具体信息？";
-      } else if (lowerText.includes('经历') || lowerText.includes('experience')) {
-        mockResponse = "林悦然拥有中央戏剧学院戏剧与影视学硕士学位，并曾在《剧场前沿》杂志担任特约撰稿人。她目前正在筹备独立电影项目《午夜回响》。";
-      } else if (lowerText.includes('理念') || lowerText.includes('philosophy')) {
-        mockResponse = `"${values.creativePhilosophy}" 这是她的核心创作理念。`;
-      } else if (lowerText.includes('联系') || lowerText.includes('contact')) {
-        mockResponse = `你可以通过邮件联系她：${personalInfo.email}。`;
-      } else {
-        mockResponse = `这是一个关于"${text}"的模拟回复。在实际部署后，我将通过DeepSeek API为您提供更智能、更具体的解答。`;
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: text }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
 
+      const data = await response.json();
+      
       setState(prev => ({
         ...prev,
         messages: [
           ...prev.messages,
           {
             id: (Date.now() + 1).toString(),
-            text: mockResponse,
+            text: data.reply,
             sender: 'ai',
             timestamp: new Date(),
           }
@@ -122,6 +114,7 @@ export const useChat = () => {
         isLoading: false,
       }));
     } catch (error) {
+      console.error('Chat error:', error);
       setState(prev => ({
         ...prev,
         error: '抱歉，发送消息时出现了错误，请稍后重试。',

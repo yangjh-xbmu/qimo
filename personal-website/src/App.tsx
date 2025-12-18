@@ -4,6 +4,7 @@ import Works from './components/Works';
 import Timeline from './components/Timeline';
 import Values from './components/Values';
 import Scholars from './components/Scholars';
+import ChatInterface from './components/ChatInterface';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -90,6 +91,8 @@ function App() {
           </p>
         </div>
       </footer>
+      
+      <ChatInterface />
     </div>
   );
 }
